@@ -29,8 +29,6 @@ export class MenuComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log('menu');
-
     this.userLoggedIn = this.authService.isUserAuthenticated();
 
     this.userDataSubscription = this.authService.userData.subscribe(
@@ -93,7 +91,12 @@ export class MenuComponent implements OnInit {
   }
 
   redirectTo() {
-    const uri = `/booking/${this.user?.id}`;
+    let uri = '';
+    if (this.authService.isUserAdmin()) {
+      uri = '/admin';
+    } else {
+      uri = `/booking/${this.user?.id}`;
+    }
     this.router
       .navigateByUrl('/', { skipLocationChange: true })
       .then(() => this.router.navigate([uri]));

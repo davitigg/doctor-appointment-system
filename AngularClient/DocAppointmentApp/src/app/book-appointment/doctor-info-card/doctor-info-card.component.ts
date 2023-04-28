@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { DoctorDto } from 'src/app/_interfaces/user/doctorDto';
+import { UserDto } from 'src/app/_interfaces/user/userDto';
 
 @Component({
   selector: 'app-doctor-info-card',
@@ -7,7 +7,7 @@ import { DoctorDto } from 'src/app/_interfaces/user/doctorDto';
   styleUrls: ['./doctor-info-card.component.css'],
 })
 export class DoctorInfoCardComponent {
-  @Input() doctor!: DoctorDto;
+  @Input() doctor!: UserDto;
   descriptions = [
     { date: '2017 - დღემდე', info: 'ჩვენი კლინიკის გენერალური დირექტორი' },
     {

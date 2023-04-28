@@ -17,7 +17,7 @@ import { AuthenticationService } from '../_services/authentication.service';
   selector: 'app-calendar',
   templateUrl: './calendar.component.html',
   styleUrls: ['./calendar.component.css'],
-  providers: [ConfirmationService],
+  providers: [],
 })
 export class CalendarComponent {
   @Input() isPersonalCalendar!: boolean;

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DocAppointmentAPI.Migrations
 {
     [DbContext(typeof(RepositoryContext))]
-    [Migration("20230427211623_v1")]
+    [Migration("20230428184329_v1")]
     partial class v1
     {
         /// <inheritdoc />
@@ -230,22 +230,22 @@ namespace DocAppointmentAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "224aadac-fb10-49bc-a5c0-05b3888d6640",
-                            ConcurrencyStamp = "760d21b0-ea55-4821-b0e0-adcc2d286714",
+                            Id = "c7941414-6a39-4b37-88c5-96a83e760a11",
+                            ConcurrencyStamp = "751f1e21-c9dc-4cbc-ba88-582088ad64e3",
                             Name = "Patient",
                             NormalizedName = "PATIENT"
                         },
                         new
                         {
-                            Id = "fbd81b3b-de2c-4e08-8047-4640863555e2",
-                            ConcurrencyStamp = "08f4782f-4197-415a-8209-5563baeeabd8",
+                            Id = "db25f383-b28c-4bda-baa7-73f8fb18cae5",
+                            ConcurrencyStamp = "6df993b6-ebeb-4df4-8fd0-15b438c59613",
                             Name = "Doctor",
                             NormalizedName = "DOCTOR"
                         },
                         new
                         {
-                            Id = "ea737fef-054d-47b8-9dfb-24aa519b8ef0",
-                            ConcurrencyStamp = "00402ff2-0200-4721-b51b-0189c228b5b9",
+                            Id = "1de7ab8d-ba29-4ebe-8cd3-3b4e6751a2ce",
+                            ConcurrencyStamp = "ae2fb287-a255-4511-b2ad-3c4ac677736a",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
@@ -360,8 +360,9 @@ namespace DocAppointmentAPI.Migrations
             modelBuilder.Entity("DocAppointmentAPI.Entities.Models.User", b =>
                 {
                     b.HasOne("DocAppointmentAPI.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId");
+                        .WithMany("Users")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Category");
                 });
@@ -432,6 +433,11 @@ namespace DocAppointmentAPI.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DocAppointmentAPI.Models.Category", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

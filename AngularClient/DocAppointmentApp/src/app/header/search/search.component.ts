@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { CategoryService } from 'src/app/_services/category.service';
 import { UserService } from 'src/app/_services/user.service';
 
 @Component({
@@ -17,11 +18,15 @@ export class SearchComponent {
   categories: any[] = [];
   doctors: any[] = [];
 
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(
+    private userService: UserService,
+    private categoryService: CategoryService,
+    private router: Router
+  ) {}
 
   searchByDoctorName(event: { query: string }) {
     this.userService
-      .getDoctors(10, 0, null, event.query)
+      .getDoctors({ limit: 10, offset: 0, name: event.query })
       .subscribe((doctors) => {
         this.doctors = doctors;
         this.suggestions = doctors.map(
@@ -31,7 +36,7 @@ export class SearchComponent {
   }
 
   searchByCategory(event: { query: string }) {
-    this.userService.getCategories(event.query).subscribe((categories) => {
+    this.categoryService.getCategories(event.query).subscribe((categories) => {
       this.categories = categories;
       this.suggestions = categories.map((item) => item.name);
     });

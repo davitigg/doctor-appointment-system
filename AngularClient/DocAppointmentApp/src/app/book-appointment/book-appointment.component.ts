@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-import { DoctorDto } from '../_interfaces/user/doctorDto';
 import { UserService } from '../_services/user.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -13,7 +12,7 @@ import { JwtService } from '../_services/jwt.service';
   styleUrls: ['./book-appointment.component.css'],
 })
 export class BookAppointmentComponent {
-  doctor?: DoctorDto;
+  doctor?: UserDto;
   user?: UserDto;
   generateAvailableSlots: boolean = false;
   isDoctorCalendar = true;

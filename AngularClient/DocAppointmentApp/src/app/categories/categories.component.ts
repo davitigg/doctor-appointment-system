@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../_services/user.service';
 import { CategoryWithDoctorsCountDto } from '../_interfaces/user/categoryWithDoctorsCountDto';
+import { CategoryService } from '../_services/category.service';
 
 @Component({
   selector: 'app-categories',
@@ -13,10 +14,10 @@ export class CategoriesComponent {
   selectedIndex: number | null = null;
   showAll = false;
 
-  constructor(private router: Router, private userService: UserService) {}
+  constructor(private router: Router, private categoryService: CategoryService) {}
 
   ngOnInit() {
-    this.userService.getCategories().subscribe({
+    this.categoryService.getCategories().subscribe({
       next: (res) => {
         this.categories = res;
       },

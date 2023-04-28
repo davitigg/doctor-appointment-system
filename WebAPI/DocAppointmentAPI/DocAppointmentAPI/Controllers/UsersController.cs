@@ -6,6 +6,7 @@ using DocAppointmentAPI.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace DocAppointmentAPI.Controllers
 {
@@ -26,43 +27,9 @@ namespace DocAppointmentAPI.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
 
-
-        // GET api/<UsersController>/5
-        [HttpGet("{id}"), Authorize]
-        public async Task<ActionResult<UserDto>> GetUserData(string id)
-        {
-            if (!_jwtHandler.CheckSelfOrAdmin(Request, id))
-                return Unauthorized();
-
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null)
-                return NotFound();
-
-            var userRole = _userManager.GetRolesAsync(user).Result.ToList().First();
-
-            var imageUrl = generateImgUrl(user.ImageId);
-
-            var userDto = new UserDto()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PersonalId = user.PersonalId,
-                Rating = user.Rating,
-                ViewCount = user.ViewCount,
-                ImageUrl = imageUrl,
-                Category = _context.Categories.Find(user.CategoryId)?.Name,
-                AppointmentsCount = _context.Appointments.Count(a => a.PatientId == user.Id || a.DoctorId == user.Id),
-                Role = userRole
-            };
-
-            return userDto;
-        }
-
         // GET: api/<UsersController>/Doctors
         [HttpGet("Doctors")]
-        public async Task<ActionResult<IEnumerable<DoctorDto>>> GetDoctors(int limit, int offset, Guid? categoryId = null, string? name = null)
+        public async Task<ActionResult<IEnumerable<DoctorDto>>> GetDoctors(int? limit = null, int? offset = null, Guid? categoryId = null, string? name = null)
         {
             var users = await _userManager.GetUsersInRoleAsync("Doctor");
 
@@ -95,20 +62,25 @@ namespace DocAppointmentAPI.Controllers
                         ImageUrl = imageUrl,
                     });
             });
-            if (offset + limit > result.Count)
+
+            // Apply limit and offset only if they are provided
+            if (offset.HasValue && limit.HasValue)
             {
-                limit = result.Count - offset;
-            }
-            try
-            {
-                result = result.GetRange(offset, limit);
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return NotFound();
+                if (offset.Value + limit.Value > result.Count)
+                {
+                    limit = result.Count - offset.Value;
+                }
+                try
+                {
+                    result = result.GetRange(offset.Value, limit.Value);
+                }
+                catch (Exception)
+                {
+                    return NotFound();
+                }
             }
 
+            return Ok(result);
         }
 
         // GET api/<UsersController>/Doctors/5
@@ -135,13 +107,69 @@ namespace DocAppointmentAPI.Controllers
                     ViewCount = user.ViewCount,
                     Category = _context.Categories.Find(user.CategoryId)?.Name,
                     ImageUrl = imageUrl
-                    //   var imageUrl = generateImgUrl(user.ImageId); ამით უნდა შეიცვალოს
 
 
                 };
                 return doctor;
             }
             else return NotFound();
+        }
+
+        // GET api/<UsersController>/5
+        [HttpGet("{id}"), Authorize]
+        public async Task<ActionResult<UserDto>> GetUser(string id)
+        {
+            if (!_jwtHandler.CheckSelfOrAdmin(Request, id))
+                return Unauthorized();
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            var userRole = _userManager.GetRolesAsync(user).Result.ToList().First();
+
+            var imageUrl = generateImgUrl(user.ImageId);
+
+            var userDto = new UserDto()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PersonalId = user.PersonalId,
+                Rating = user.Rating,
+                ViewCount = user.ViewCount,
+                ImageUrl = imageUrl,
+                Category = _context.Categories.Find(user.CategoryId)?.Name,
+                AppointmentsCount = _context.Appointments.Count(a => a.PatientId == user.Id || a.DoctorId == user.Id),
+                Role = userRole
+            };
+
+            return userDto;
+        }
+
+        // GET: api/<UsersController>/
+        [HttpGet, Authorize(Roles = "Admin")]
+        public async Task<IEnumerable<UserDto>> GetUsers(string? role = null)
+        {
+            var users = string.IsNullOrEmpty(role)
+                ? await _userManager.Users.ToListAsync()
+                : await _userManager.GetUsersInRoleAsync(role);
+
+            return users.Select(u => new UserDto
+            {
+                Id = u.Id,
+                Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                PersonalId = u.PersonalId,
+                Rating = u.Rating,
+                ViewCount = u.ViewCount,
+                ImageUrl = generateImgUrl(u.ImageId),
+                Category = _context.Categories.Find(u.CategoryId)?.Name,
+                AppointmentsCount = _context.Appointments.Count(a => a.PatientId == u.Id || a.DoctorId == u.Id),
+                Role = _userManager.GetRolesAsync(u).Result.FirstOrDefault()
+            });
         }
 
         // PUT api/<UsersController>/5
@@ -182,8 +210,6 @@ namespace DocAppointmentAPI.Controllers
             else return Problem();
         }
 
-
-
         private bool isUserRole(User user, string role)
         {
             var result = _userManager.IsInRoleAsync(user, role).Result;
@@ -219,32 +245,12 @@ namespace DocAppointmentAPI.Controllers
             await _userManager.ChangePasswordAsync(user, user.PasswordHash,
                 userForUpdateDto.Password);
         }
-
         private string generateImgUrl(string imgId)
         {
             var apiUrl = $"{Request.Scheme}://{Request.Host.Value}"; // Get the base URL of the API
             var imageUrl = $"{apiUrl}/api/Files/ProfileImage/{imgId}";
             return imageUrl;
         }
-
-        //ამათი გადაკეთება შეიძლება ერთიანად
-        //// GET: api/<UsersController>/Admins
-        //[HttpGet("Admins"), Authorize(Roles = "Admin")]
-        //public async Task<IEnumerable<User>> GetAdmins()
-        //{
-        //    var users = await _userManager.GetUsersInRoleAsync("Admin");
-
-        //    return users;
-        //}
-
-        //// GET: api/<UsersController>/Patients
-        //[HttpGet("Patients"), Authorize(Roles = "Admin")]
-        //public async Task<IEnumerable<User>> GetPatients()
-        //{
-        //    var users = await _userManager.GetUsersInRoleAsync("Patient");
-
-        //    return users;
-        //}
 
     }
 }

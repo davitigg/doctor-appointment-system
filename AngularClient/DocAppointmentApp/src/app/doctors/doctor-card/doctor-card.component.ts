@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { DoctorDto } from 'src/app/_interfaces/user/doctorDto';
 
 @Component({
   selector: 'app-doctor-card',

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DocAppointmentAPI.Entities.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace DocAppointmentAPI.Models
 {
@@ -9,5 +10,8 @@ namespace DocAppointmentAPI.Models
         [Required(ErrorMessage = "Please enter Doctor Category Name")]
         [MaxLength(60, ErrorMessage = "Maximum length for the Name is 60 characters.")]
         public string? Name { get; set; }
+
+        public ICollection<User> Users { get; set; }
+
     }
 }

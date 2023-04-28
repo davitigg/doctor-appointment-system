@@ -23,5 +23,12 @@ export class JwtService {
     return userId;
   }
 
-  
+  getUserRoleFromJwtToken() {
+    const decodedToken = this.getDecodedToken();
+    const userId =
+      decodedToken[
+        'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+      ];
+    return userId;
+  }
 }

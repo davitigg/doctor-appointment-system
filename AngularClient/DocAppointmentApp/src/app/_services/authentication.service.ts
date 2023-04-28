@@ -23,7 +23,8 @@ export class AuthenticationService {
     private http: HttpClient,
     private jwtHelper: JwtHelperService,
     private router: Router,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private userService: UserService
   ) {
     const storedUserData = sessionStorage.getItem('userData');
     this.userDataSubject = new BehaviorSubject<any>(
@@ -50,11 +51,6 @@ export class AuthenticationService {
     this.displayLoginDialogSource.next();
   }
 
-  fetchCurrentUserData() {
-    const userId = this.jwtService.getUserIdFromJwtToken();
-    return this.http.get<UserDto>(`https://localhost:5001/api/users/${userId}`);
-  }
-
   logOut() {
     localStorage.removeItem('jwt');
     sessionStorage.removeItem('userData');
@@ -65,6 +61,13 @@ export class AuthenticationService {
     const token = localStorage.getItem('jwt');
     if (token && !this.jwtHelper.isTokenExpired(token)) return true;
     else return false;
+  }
+
+  public isUserAdmin() {
+    return (
+      this.isUserAuthenticated() &&
+      this.jwtService.getUserRoleFromJwtToken() === 'Admin'
+    );
   }
 
   public isUserDoctor(): boolean {
@@ -108,7 +111,7 @@ export class AuthenticationService {
         tap((response: AuthResponseDto) => {
           localStorage.setItem('jwt', response.token);
 
-          this.fetchCurrentUserData().subscribe((userData) => {
+          this.userService.GetUser().subscribe((userData) => {
             sessionStorage.setItem('userData', JSON.stringify(userData));
             this.setUserData(userData);
           });

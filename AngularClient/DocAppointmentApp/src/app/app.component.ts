@@ -12,11 +12,14 @@ import { Router } from '@angular/router';
 export class AppComponent {
   title = 'DocAppointmentApp';
 
-  constructor(private authService: AuthenticationService) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthenticationService
+  ) {}
 
   ngOnInit() {
     if (localStorage.getItem('jwt') && !this.authService.getUserData()) {
-      this.authService.fetchCurrentUserData().subscribe(
+      this.userService.GetUser().subscribe(
         (userData) => {
           sessionStorage.setItem('userData', JSON.stringify(userData));
           this.authService.setUserData(userData);

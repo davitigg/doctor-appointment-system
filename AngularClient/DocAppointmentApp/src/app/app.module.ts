@@ -35,11 +35,15 @@ import { ToastModule } from 'primeng/toast';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { UnauthorizedToastComponent } from './calendar/unauthorized-toast/unauthorized-toast.component';
 import { JwtModule } from '@auth0/angular-jwt';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { AuthGuard } from './_guards/auth.guard';
 import { UserInfoCardComponent } from './book-appointment/user-info-card/user-info-card.component';
 import { ForgotPasswordComponent } from './authentication/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './authentication/reset-password/reset-password.component';
+import { AdminComponent } from './admin/admin.component';
+import { AdminHeaderComponent } from './admin/admin-header/admin-header.component';
+import { AdminTableComponent } from './admin/admin-table/admin-table.component';
+import { ToolbarModule } from 'primeng/toolbar';
 
 export function tokenGetter() {
   return localStorage.getItem('jwt');
@@ -66,6 +70,9 @@ export function tokenGetter() {
     UserInfoCardComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
+    AdminComponent,
+    AdminHeaderComponent,
+    AdminTableComponent,
   ],
   imports: [
     BrowserModule,
@@ -94,8 +101,9 @@ export function tokenGetter() {
         disallowedRoutes: [],
       },
     }),
+    ToolbarModule,
   ],
-  providers: [AuthGuard, MessageService],
+  providers: [AuthGuard, MessageService, ConfirmationService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

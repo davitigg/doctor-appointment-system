@@ -20,6 +20,8 @@ namespace DocAppointmentAPI.Repository
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new AppointmentConfiguration());
             modelBuilder.ApplyConfiguration(new EmailValidationConfiguration());
+            modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+
 
         }
 

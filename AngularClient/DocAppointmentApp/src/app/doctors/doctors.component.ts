@@ -9,8 +9,8 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
   styleUrls: ['./doctors.component.css'],
 })
 export class DoctorsComponent implements OnInit {
-  categoryId: string | null = null;
-  name: string | null = null;
+  categoryId?: string;
+  name?: string;
   doctors: any[] = [];
   offset: number = 0;
   limit: number = 6; // Adjust this value based on your desired number of doctors per request
@@ -29,14 +29,10 @@ export class DoctorsComponent implements OnInit {
 
       if (categoryId) {
         this.categoryId = categoryId;
-      } else {
-        this.categoryId = null;
       }
 
       if (name) {
         this.name = name;
-      } else {
-        this.name = null;
       }
       this.resetComponent();
       this.loadDoctors();
@@ -45,7 +41,12 @@ export class DoctorsComponent implements OnInit {
 
   loadDoctors() {
     this.userService
-      .getDoctors(this.limit, this.offset, this.categoryId, this.name)
+      .getDoctors({
+        limit: this.limit,
+        offset: this.offset,
+        categoryId: this.categoryId,
+        name: this.name,
+      })
       .subscribe({
         next: (newDoctors) => {
           this.doctors = [...newDoctors];
@@ -63,7 +64,12 @@ export class DoctorsComponent implements OnInit {
 
   lazyLoadDoctors() {
     this.userService
-      .getDoctors(this.limit, this.offset, this.categoryId, this.name)
+      .getDoctors({
+        limit: this.limit,
+        offset: this.offset,
+        categoryId: this.categoryId,
+        name: this.name,
+      })
       .subscribe({
         next: (newDoctors) => {
           this.doctors = [...this.doctors, ...newDoctors];

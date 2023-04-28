@@ -122,7 +122,8 @@ namespace DocAppointmentAPI.Migrations
                         name: "FK_AspNetUsers_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -242,9 +243,9 @@ namespace DocAppointmentAPI.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "224aadac-fb10-49bc-a5c0-05b3888d6640", "760d21b0-ea55-4821-b0e0-adcc2d286714", "Patient", "PATIENT" },
-                    { "ea737fef-054d-47b8-9dfb-24aa519b8ef0", "00402ff2-0200-4721-b51b-0189c228b5b9", "Admin", "ADMIN" },
-                    { "fbd81b3b-de2c-4e08-8047-4640863555e2", "08f4782f-4197-415a-8209-5563baeeabd8", "Doctor", "DOCTOR" }
+                    { "1de7ab8d-ba29-4ebe-8cd3-3b4e6751a2ce", "ae2fb287-a255-4511-b2ad-3c4ac677736a", "Admin", "ADMIN" },
+                    { "c7941414-6a39-4b37-88c5-96a83e760a11", "751f1e21-c9dc-4cbc-ba88-582088ad64e3", "Patient", "PATIENT" },
+                    { "db25f383-b28c-4bda-baa7-73f8fb18cae5", "6df993b6-ebeb-4df4-8fd0-15b438c59613", "Doctor", "DOCTOR" }
                 });
 
             migrationBuilder.CreateIndex(

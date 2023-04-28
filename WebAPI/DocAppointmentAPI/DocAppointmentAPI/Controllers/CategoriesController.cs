@@ -1,5 +1,7 @@
 ﻿using DocAppointmentAPI.Entities.DataTransferObjects;
+using DocAppointmentAPI.Models;
 using DocAppointmentAPI.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,93 +40,96 @@ namespace DocAppointmentAPI.Controllers
             return categoriesWithDoctorsCount;
         }
 
-        //    // GET: api/Categories/5
-        //    [HttpGet("{id}")]
-        //    public async Task<ActionResult<Category>> GetCategory(Guid id)
-        //    {
-        //      if (_context.Categories == null)
-        //      {
-        //          return NotFound();
-        //      }
-        //        var category = await _context.Categories.FindAsync(id);
+        // PUT: api/Categories/5
+        [HttpPut("{id}"), Authorize(Roles = ("Admin"))]
+        public async Task<IActionResult> PutCategory(Guid id, string categoryName)
+        {
+            if (string.IsNullOrWhiteSpace(categoryName))
+            {
+                return BadRequest("Category name cannot be null or empty.");
+            }
 
-        //        if (category == null)
-        //        {
-        //            return NotFound();
-        //        }
+            var category = await _context.Categories.FindAsync(id);
 
-        //        return category;
-        //    }
+            if (category == null)
+            {
+                return NotFound();
+            }
 
-        //    // PUT: api/Categories/5
-        //    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //    [HttpPut("{id}")]
-        //    public async Task<IActionResult> PutCategory(Guid id, Category category)
-        //    {
-        //        if (id != category.Id)
-        //        {
-        //            return BadRequest();
-        //        }
+            // Check if the category with the same name already exists
+            if (await _context.Categories.AnyAsync(c => c.Name == categoryName))
+            {
+                return BadRequest("A category with this name already exists.");
+            }
 
-        //        _context.Entry(category).State = EntityState.Modified;
+            category.Name = categoryName;
+            _context.Entry(category).State = EntityState.Modified;
 
-        //        try
-        //        {
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!CategoryExists(id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CategoryExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-        //        return NoContent();
-        //    }
+            return NoContent();
+        }
 
-        //    // POST: api/Categories
-        //    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //    [HttpPost]
-        //    public async Task<ActionResult<Category>> PostCategory(Category category)
-        //    {
-        //      if (_context.Categories == null)
-        //      {
-        //          return Problem("Entity set 'RepositoryContext.Categories'  is null.");
-        //      }
-        //        _context.Categories.Add(category);
-        //        await _context.SaveChangesAsync();
+        // POST: api/Categories
+        [HttpPost, Authorize(Roles = ("Admin"))]
+        public async Task<ActionResult<Category>> PostCategory(string categoryName)
+        {
+            if (_context.Categories == null)
+            {
+                return Problem("Entity set 'RepositoryContext.Categories' is null.");
+            }
 
-        //        return CreatedAtAction("GetCategory", new { id = category.Id }, category);
-        //    }
+            // Check if the category with the same name already exists
+            if (await _context.Categories.AnyAsync(c => c.Name == categoryName))
+            {
+                return BadRequest("A category with this name already exists.");
+            }
 
-        //    // DELETE: api/Categories/5
-        //    [HttpDelete("{id}")]
-        //    public async Task<IActionResult> DeleteCategory(Guid id)
-        //    {
-        //        if (_context.Categories == null)
-        //        {
-        //            return NotFound();
-        //        }
-        //        var category = await _context.Categories.FindAsync(id);
-        //        if (category == null)
-        //        {
-        //            return NotFound();
-        //        }
+            var category = new Category { Name = categoryName };
 
-        //        _context.Categories.Remove(category);
-        //        await _context.SaveChangesAsync();
+            _context.Categories.Add(category);
+            await _context.SaveChangesAsync();
 
-        //        return NoContent();
-        //    }
+            return StatusCode(201);
+        }
 
-        //    private bool CategoryExists(Guid id)
-        //    {
-        //        return (_context.Categories?.Any(e => e.Id == id)).GetValueOrDefault();
-        //    }
+        // DELETE: api/Categories/5
+        [HttpDelete("{id}"), Authorize(Roles = ("Admin"))]
+        public async Task<IActionResult> DeleteCategory(Guid id)
+        {
+            if (_context.Categories == null)
+            {
+                return NotFound();
+            }
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool CategoryExists(Guid id)
+        {
+            return (_context.Categories?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
     }
 }

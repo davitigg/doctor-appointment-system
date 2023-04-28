@@ -8,6 +8,7 @@ import { ScrollToTopGuard } from './_guards/scroll-to-top.guard';
 import { NotAuthenticatedGuard } from './_guards/not-authenticated.guard';
 import { ForgotPasswordComponent } from './authentication/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './authentication/reset-password/reset-password.component';
+import { AdminComponent } from './admin/admin.component';
 
 const routes: Routes = [
   {
@@ -31,6 +32,10 @@ const routes: Routes = [
     path: 'booking/:id',
     component: BookAppointmentComponent,
     data: { bookingPage: false },
+  },
+  {
+    path: 'admin',
+    component: AdminComponent,
   },
   { path: '', redirectTo: '/doctors', pathMatch: 'full' },
   { path: '**', component: NotFoundComponent },
